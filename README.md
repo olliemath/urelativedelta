@@ -1,11 +1,129 @@
-# urelativedelta
-A small fast implementation of relativedeltas
+# [uRelativeDelta][pypi]
 
-# benchmarks
+A small fast implementation of relativedelta
 
-Shifting 5mn datetime objects gives us:
+[![urelativedelta GitHub Actions][gh-image]][gh-checks]
+[![urelativedelta on PyPI][pypi-image]][pypi]
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+[gh-image]: https://github.com/olliemath/urelativedelta/workflows/test/badge.svg
+[gh-checks]: https://github.com/olliemath/urelativedelta/actions?query=workflow%3Atest
+[pypi-image]: https://img.shields.io/pypi/v/urelativedelta
+[pypi]: https://pypi.org/project/urelativedelta/
+
+urelativedelta provides the following utilities:
+
+- `relativedelta` a simple replacement for [dateutil.relativedelta](https://dateutil.readthedocs.io/en/stable/relativedelta.html)
+- Proceedural helper functions for shifting date and datetime values by months and years
+
+it is a python port of the [chronoutil](https://github.com/olliemath/chronoutil) library for rust (itself inspired by [dateutil](https://pypi.org/project/python-dateutil)).
+
+
+## Benchmarks
+
+Originally urelativedelta was used for speeding up complicated cashflow bucketing
+computations (where there are lots of relativedeltas). It's pretty successful.
+Shifting 5 million datetime objects by 100 years gives us:
 
 | interpreter | urelativedelta | python-dateutil | speedup |
 | ------ | ------ | ------ | ------ |
 | cpython 3.11 | 6.72s | 20.36s | 3.03x |
 | pypy 3.9 | 0.72s | 3.13s | 4.34x |
+
+
+## Usage
+
+Install via:
+
+```bash
+pip install urelativedelta
+```
+
+then you can run
+
+```python
+from datetime import datetime
+from urelativedelta import relativedelta
+
+delta = relativedelta(years=1, months=1, days=1, hours=1)
+datetime(2050, 1, 1) + delta
+```
+
+## Overview
+
+### relativedelta
+
+urelativedelta uses a **`relativedelta`** type to represent the magnitude of a time span
+which may not be absolute (i.e. which is not simply a fixed number of nanoseconds).
+A relativedelta is made up of a number of months together with an absolute `timedelta`
+component.
+
+```python
+delta = relativedelta(months=1, days=1)
+start = datetime(2020, 1, 1)
+assert start + delta == datetime(2020, 2, 2)
+```
+
+The behaviour of `relativedelta` is consistent and well-defined in edge-cases
+(see the Design Decisions section for an explanation):
+
+```python
+delta = relativedelta(months=1, days=1)
+start = date(2020, 1, 30)
+assert start + delta == date(2020, 3, 1)
+```
+
+### Shift functions
+
+urelativedelta also exposes useful shift functions which are used internally, namely:
+
+- **`shift_months`** to shift a datelike value by a given number of months
+- **`shift_years`** to shift a datelike value by a given number of years
+- **`with_year`** to shift a datelike value to a given day
+- **`with_month`** to shift a datelike value to a given month
+- **`with_year`** to shift a datelike value to a given year
+
+## Design decisions and gotchas
+
+We favour simplicity over complexity: we use only the Gregorian calendar and
+make no changes e.g. for dates before the 1500s.
+
+For days between the 1st and 28th, shifting by months has an obvious
+unambiguous meaning which we always stick to. One month after Jan 28th is
+always Feb 28th. Shifting Feb 28th by another month will give Mar 28th.
+
+When shifting a day that has no equivalent in another month (e.g. asking
+for one month after Jan 30th), we first compute the target month, and then if
+the corresponding day does not exist in that month, we take the final day of the
+month as the result. So, on a leap year, one month after Jan 30th is Feb 29th.
+
+The order of precidence for a `relativedelta` is as follows:
+
+1.  Work out the target month, if shifting by months
+2.  If the initial day does not exist in that month, take the final day of the month
+3.  Execute any further `timedelta` shifts
+
+So a `relativedelta` of 1 month and 1 day applied to Jan 31st first shifts to the
+last day of Feb, and then adds a single day, giving the 1st of Mar. Applying to Jan 30th
+gives the same result.
+
+Shifted dates have no _memory_ of the date they were shifted from. Thus if we shift
+Jan 31st by one month and obtain Feb 28th, a further shift of one month will be Mar 28th,
+_not_ Mar 31st.
+
+This leads us to an interesting point about the `relativedelta`: addition is not
+_[associative](https://en.wikipedia.org/wiki/Associative_property)_:
+
+```python
+start = date(2020, 1, 31)
+delta = relativedelta(months=1)
+
+d1 = (start + delta) + delta
+d2 = start + (delta + delta)
+
+assert d1 == date(2020, 3, 29)
+assert d2 == date(2020, 3, 31)
+```
+
+If you want a series of shifted dates, we advise using the dateutil's `rrule`, which we
+will implement in a later release of urelativedelta to account of some of these subtleties.

@@ -4,7 +4,7 @@ version = "0.1.0"
 authors = [
   { name = "Oliver Margetts", email = "oliver.margetts@gmail.com" }
 ]
-description = "A small fast implementation of urelativedeltas"
+description = "A small fast implementation of relativedelta"
 readme = "README.md"
 requires-python = ">=3.9"
 classifiers = [
@@ -16,6 +16,7 @@ classifiers = [
 [project.urls]
 "Homepage" = "https://github.com/olliemath/urelativedelta"
 "Bug Tracker" = "https://github.com/olliemath/urelativedelta"
+"Repository" = "https://github.com/olliemath/urelativedelta"
 
 [build-system]
 requires = ["hatchling"]
