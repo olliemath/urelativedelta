@@ -1,10 +1,12 @@
 from __future__ import annotations
 
-import datetime
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    datelike = datetime.datetime | datetime.date
+    from datetime import date, datetime
+    from typing import TypeVar
+
+    D = TypeVar("D", date, datetime)
 
 
 def is_leap_year(year: int) -> bool:
@@ -26,7 +28,7 @@ def normalise_day(year: int, month: int, day: int) -> int:
         return day
 
 
-def shift_months(date: datelike, months: int) -> datelike:
+def shift_months(date: D, months: int) -> D:
     """Shift a date by the given number of months.
 
     Ambiguous month-ends are shifted backwards as necessary."""
@@ -37,14 +39,14 @@ def shift_months(date: datelike, months: int) -> datelike:
     return date.replace(year=year, month=month, day=day)
 
 
-def shift_years(date: datelike, years: int) -> datelike:
+def shift_years(date: D, years: int) -> D:
     """Shift a date by the given number of years.
 
     Ambiguous month-ends are shifted backwards as necessary."""
     return shift_months(date, years * 12)
 
 
-def with_day(date: datelike, day: int) -> datelike:
+def with_day(date: D, day: int) -> D:
     """Shift the date to have the given day.
 
     Ambiguous month-ends are shifted backwards as necessary.
@@ -52,7 +54,7 @@ def with_day(date: datelike, day: int) -> datelike:
     return date.replace(day=normalise_day(date.year, date.month, day))
 
 
-def with_month(date: datelike, month: int) -> datelike:
+def with_month(date: D, month: int) -> D:
     """Shift the date to have the given month.
 
     Ambiguous month-ends are shifted backwards as necessary.
@@ -63,7 +65,7 @@ def with_month(date: datelike, month: int) -> datelike:
     return shift_months(date, month - date.month)
 
 
-def with_year(date: datelike, year: int) -> datelike:
+def with_year(date: D, year: int) -> D:
     """Shift the date to have the given year.
 
     Ambiguous month-ends are shifted backwards as necessary.

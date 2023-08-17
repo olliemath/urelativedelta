@@ -29,7 +29,7 @@ class relativedelta:  # noqa: N801
         return hash((self.months, self.timedelta))
 
     def __bool__(self) -> bool:
-        return self.months or self.timedelta
+        return bool(self.months or self.timedelta)
 
     def __neg__(self) -> relativedelta:
         return type(self)(months=-self.months, timedelta=-self.timedelta)

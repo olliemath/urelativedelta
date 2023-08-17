@@ -10,6 +10,7 @@
 black==23.7.0
 click==8.1.6
 iniconfig==2.0.0
+mypy==1.5.1
 mypy-extensions==1.0.0
 packaging==23.1
 pathspec==0.11.2
@@ -19,3 +20,4 @@ pytest==7.4.0
 python-dateutil==2.8.2
 ruff==0.0.284
 six==1.16.0
+typing-extensions==4.7.1

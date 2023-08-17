@@ -28,6 +28,7 @@ dev-dependencies = [
     "ruff>=0.0.284",
     "pytest>=7.4.0",
     "python-dateutil>=2.8.2",
+    "mypy>=1.5.1",
 ]
 
 [tool.hatch.metadata]
