@@ -1,0 +1,90 @@
+[project]
+name = "relativedelta"
+version = "0.1.0"
+authors = [
+  { name = "Oliver Margetts", email = "oliver.margetts@gmail.com" }
+]
+description = "A small fast implementation of relativedeltas"
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/olliemath/relativedelta"
+"Bug Tracker" = "https://github.com/olliemath/relativedelta"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.rye]
+managed = true
+dev-dependencies = [
+    "black>=23.7.0",
+    "ruff>=0.0.284",
+    "pytest>=7.4.0",
+]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.black]
+line-length = 88
+target-version = ["py39"]
+
+## File Selection
+force-exclude = '''
+  (
+    ^.git
+    | .venv
+  )
+'''
+
+[tool.ruff]
+line-length = 88
+target-version = "py39"
+
+## Rule Selection
+# to read about ruff rules check this: https://beta.ruff.rs/docs/rules/
+select = [
+  'E', 'W',         # pycodestyle: E, W
+  'F',              # pyflakes: F
+  'B',              # flake8-bugbear: B
+  'N',              # pep8-naming: N
+  'ISC',            # flake8-implicit-str-concat: ISC
+  'PT',             # flake8-pytest-style: PT
+  'UP',             # pyupgrade: UP
+  'RUF',            # ruff: RUF
+]
+ignore = [
+  'E501',   # Line to long: https://beta.ruff.rs/docs/rules/line-too-long/
+]
+
+## File Selection
+force-exclude = true  # don't check excluded files even if passed directly
+extend-exclude = [
+  './.venv',
+]
+
+[tool.ruff.pydocstyle]
+convention = "google"
+
+[tool.ruff.isort]
+required-imports = [
+  "from __future__ import annotations",
+]
+
+relative-imports-order = "closest-to-furthest"
+combine-as-imports = true
+
+section-order = [
+  "future",
+  "standard-library",
+  "third-party",
+  "first-party",
+  "local-folder",
+]
