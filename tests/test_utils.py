@@ -4,7 +4,13 @@ from datetime import date, datetime
 
 import pytest
 
-from relativedelta import is_leap_year, shift_months, shift_years, with_month, with_year
+from urelativedelta import (
+    is_leap_year,
+    shift_months,
+    shift_years,
+    with_month,
+    with_year,
+)
 
 LEAP_YEARS_1900_TO_2020 = frozenset(
     (

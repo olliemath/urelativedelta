@@ -6,7 +6,7 @@ from timeit import timeit
 
 from dateutil.relativedelta import relativedelta as du_delta
 
-from relativedelta import relativedelta
+from urelativedelta import relativedelta
 
 klass = sys.argv[1]
 

@@ -4,7 +4,7 @@ from datetime import date, timedelta
 
 import pytest
 
-from relativedelta import relativedelta
+from urelativedelta import relativedelta
 
 
 def test_duration_arithmetic():

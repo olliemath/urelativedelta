@@ -28,7 +28,7 @@ jobs:
           black --check .
       - name: mypy
         run: |
-          mypy relativedelta/ tests/
+          mypy urelativedelta/ tests/
 
   test:
     runs-on: ubuntu-latest
