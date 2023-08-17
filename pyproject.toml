@@ -55,6 +55,7 @@ select = [
   'F',              # pyflakes: F
   'B',              # flake8-bugbear: B
   'N',              # pep8-naming: N
+  'I',              # isort: I
   'ISC',            # flake8-implicit-str-concat: ISC
   'PT',             # flake8-pytest-style: PT
   'UP',             # pyupgrade: UP
