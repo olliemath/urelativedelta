@@ -23,14 +23,16 @@ it is a python port of the [chronoutil](https://github.com/olliemath/chronoutil)
 ## Benchmarks
 
 Originally urelativedelta was used for speeding up complicated cashflow bucketing
-computations (where there are lots of relativedeltas). It's pretty successful.
-Shifting 5 million datetime objects by 100 years gives us:
+computations (where there are lots of relativedeltas). It's pretty successful:
 
-| interpreter | urelativedelta | python-dateutil | speedup |
-| ------ | ------ | ------ | ------ |
-| cpython 3.11 | 6.72s | 20.36s | 3.03x |
-| pypy 3.9 | 0.72s | 3.13s | 4.34x |
+| benchmark | interpreter | urelativedelta | python-dateutil | speedup |
+| ------ | ------ | ------ | ------ | ------ |
+| shift 5mn dates by 100 years | cpython3.11 | 6.65s | 20.35s | 3.06x |
+| shift 5mn dates by 100 years | pypy3.9 | 0.72s | 3.09s | 4.29x |
+| subtract 5mn date pairs | cpython3.11 | 7.30s | 17.62s | 2.41x |
+| subtract 5mn date pairs | pypy3.9 | 1.52s | 3.31s | 2.18x |
 
+all of which means that using pypy and switching libraries can buy you a ~30x speed improvement.
 
 ## Usage
 
