@@ -2,16 +2,22 @@
 from __future__ import annotations
 
 from datetime import date as _date, datetime as _datetime, timedelta as _pytimedelta
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING as _TYPE_CHECKING
 
-from .utils import shift_months
+from .utils import shift_months as _shift_months
 
-if TYPE_CHECKING:
+if _TYPE_CHECKING:
     from typing import Any
 
 
-class relativedelta:  # noqa: N801
-    def __init__(self, years: int = 0, months: int = 0, timedelta=None, **delta_kwargs):
+class relativedelta:  # noqa: N801 - for consistency with timedelta and dateutil
+    def __init__(
+        self,
+        years: int = 0,
+        months: int = 0,
+        timedelta: _pytimedelta | None = None,
+        **delta_kwargs,
+    ):
         self.months = months + 12 * years
         self.timedelta = _pytimedelta(**delta_kwargs)
         if timedelta is not None:
@@ -34,7 +40,7 @@ class relativedelta:  # noqa: N801
     def __neg__(self) -> relativedelta:
         return type(self)(months=-self.months, timedelta=-self.timedelta)
 
-    def __add__(self, other) -> relativedelta:
+    def __add__(self, other: Any) -> relativedelta:
         if isinstance(other, relativedelta):
             months = self.months + other.months
             delta = self.timedelta + other.timedelta
@@ -46,16 +52,16 @@ class relativedelta:  # noqa: N801
 
         return self.__class__(months=months, timedelta=delta)
 
-    def __sub__(self, other) -> relativedelta:
-        return self + (-other)
-
     def __radd__(self, other):
         if isinstance(other, (_date, _datetime)):
-            return shift_months(other, self.months) + self.timedelta
+            return _shift_months(other, self.months) + self.timedelta
         elif isinstance(other, (_pytimedelta, relativedelta)):
             return self + other
         else:
             return NotImplemented
+
+    def __sub__(self, other: Any) -> relativedelta:
+        return self + (-other)
 
     def __rsub__(self, other):
         return other + (-self)

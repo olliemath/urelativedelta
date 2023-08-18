@@ -14,7 +14,8 @@ A small fast implementation of relativedelta
 urelativedelta provides the following utilities:
 
 - `relativedelta` a simple replacement for [dateutil.relativedelta](https://dateutil.readthedocs.io/en/stable/relativedelta.html)
-- Proceedural helper functions for shifting date and datetime values by months and years
+- `daterule`: a module of useful iterators yielding regular (e.g. monthly) dates
+- proceedural helper functions for shifting date and datetime values by months and years
 
 it is a python port of the [chronoutil](https://github.com/olliemath/chronoutil) library for rust (itself inspired by [dateutil](https://pypi.org/project/python-dateutil)).
 
@@ -73,6 +74,26 @@ start = date(2020, 1, 30)
 assert start + delta == date(2020, 3, 1)
 ```
 
+### daterule
+
+urelativedelta provides a **`daterule`** module, containing functions
+for creating iterators which reliably generate a collection of dates
+at regular intervals.
+For example, the following will yield one `date` on the last day of each
+month in 2025:
+
+```python
+start = date(2025, 1, 31)
+rule = daterule.monthly(start, count=12)
+# yields 2025-1-31, 2025-2-28, 2025-3-31, 2025-4-30, ...
+```
+
+the most general rule is constructed from a relativedelta:
+```python
+freq = relativedelta(years=1, months=1, days=-1)
+rule = daterule.iterator(freq, start, ...)
+```
+
 ### Shift functions
 
 urelativedelta also exposes useful shift functions which are used internally, namely:
@@ -125,5 +146,13 @@ assert d1 == date(2020, 3, 29)
 assert d2 == date(2020, 3, 31)
 ```
 
-If you want a series of shifted dates, we advise using the dateutil's `rrule`, which we
-will implement in a later release of urelativedelta to account of some of these subtleties.
+If you want a series of shifted dates, we advise using the `DateRule`, which takes
+account of some of these subtleties:
+```python
+start = date(2020, 1, 31)
+delta = relativedelta(months=1)
+rule = DateRule(delta, start)
+assert next(rule) == date(2020, 1, 31)
+assert next(rule) == date(2020, 2, 29)
+assert next(rule) == date(2020, 3, 31)
+```
