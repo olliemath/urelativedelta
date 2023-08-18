@@ -98,6 +98,9 @@ class RelativeDelta:
     def __mul__(self, n: int) -> RelativeDelta:
         return self.__class__(months=self.months * n, timedelta=self.timedelta * n)
 
+    def __rmul__(self, n: int) -> RelativeDelta:
+        return self * n
+
     def __floordiv__(self, n: int) -> RelativeDelta:
         return self.__class__(months=self.months // n, timedelta=self.timedelta // n)
 

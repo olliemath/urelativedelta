@@ -27,6 +27,7 @@ def test_duration_arithmetic():
 
     assert x // 2 == relativedelta(months=5 * 6 + 3, seconds=50)
     assert x * 2 == relativedelta(months=10 * 12 + 14, seconds=200)
+    assert 2 * x == x * 2, "Multiplication should be symmetric"
 
     # Dividing a 1-month by e.g. 2 has no unambiguous meaning
     with pytest.raises(TypeError, match="unsupported operand"):
