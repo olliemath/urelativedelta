@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from . import daterule
-from .relativedelta import relativedelta
+from .relativedelta import RelativeDelta, relativedelta
 from .utils import (
     is_leap_year,
     shift_months,
@@ -12,6 +12,7 @@ from .utils import (
 )
 
 __all__ = [
+    "RelativeDelta",
     "daterule",
     "is_leap_year",
     "relativedelta",

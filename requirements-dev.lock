@@ -7,8 +7,10 @@
 #   all-features: false
 
 -e file:.
+attrs==23.1.0
 black==23.7.0
 click==8.1.6
+hypothesis==6.82.5
 iniconfig==2.0.0
 mypy==1.5.1
 mypy-extensions==1.0.0
@@ -20,4 +22,6 @@ pytest==7.4.0
 python-dateutil==2.8.2
 ruff==0.0.284
 six==1.16.0
+sortedcontainers==2.4.0
+types-python-dateutil==2.8.19.14
 typing-extensions==4.7.1

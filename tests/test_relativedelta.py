@@ -1,10 +1,15 @@
 from __future__ import annotations
 
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 
+import dateutil.relativedelta
 import pytest
+from hypothesis import given, strategies as st
 
 from urelativedelta import relativedelta
+
+MIND = datetime(1600, 1, 1)
+MAXD = datetime(3000, 1, 1)
 
 
 def test_duration_arithmetic():
@@ -45,3 +50,72 @@ def test_date_arithmetic():
     tricky_delta = relativedelta(months=24, days=-1)
     assert base - tricky_delta == date(2018, 3, 1)
     assert base - tricky_delta == not_leap - tricky_delta
+
+
+def test_differences():
+    # Later day of month -> last day of month counts as 1 month shift
+    d1 = date(2020, 2, 29)
+
+    d2 = date(2020, 1, 31)
+    assert relativedelta.difference(d1, d2) == relativedelta(months=1)
+
+    d2 = date(2020, 1, 30)
+    assert relativedelta.difference(d1, d2) == relativedelta(months=1)
+
+    d2 = date(2020, 1, 29)
+    assert relativedelta.difference(d1, d2) == relativedelta(months=1)
+
+    # Earlier day of month -> later day of month counts as day shift
+    d2 = date(2020, 1, 28)
+    assert relativedelta.difference(d1, d2) == relativedelta(months=1, days=1)
+
+    # Later day of month -> not last day of month counts as day shift
+    d1 = date(2020, 2, 28)
+    d2 = date(2020, 1, 31)
+    assert relativedelta.difference(d1, d2) == relativedelta(days=28)
+
+    d2 = date(2020, 1, 30)
+    assert relativedelta.difference(d1, d2) == relativedelta(days=29)
+
+
+def test_differences_negative():
+    d1 = date(2020, 2, 29)
+    d2 = date(2020, 3, 31)
+
+    assert relativedelta.difference(d1, d2) == relativedelta(months=-1)
+
+    d1 = date(2020, 2, 28)
+    assert relativedelta.difference(d1, d2) == relativedelta(months=-1, days=-1)
+
+    d1 = date(2020, 2, 29)
+    d2 = date(2020, 3, 30)
+    assert relativedelta.difference(d1, d2) == relativedelta(months=-1)
+
+    d1 = date(2020, 2, 29)
+    d2 = date(2020, 3, 29)
+    assert relativedelta.difference(d1, d2) == relativedelta(months=-1)
+
+    d1 = date(2020, 2, 29)
+    d2 = date(2020, 3, 28)
+    assert relativedelta.difference(d1, d2) == relativedelta(days=-28)
+
+
+@given(st.datetimes(), st.datetimes())
+def test_difference_spans_gap(d1, d2):
+    delta = relativedelta.difference(d1, d2)
+    assert d2 + delta == d1
+
+
+# Prevent overflows with adding deltas to dates
+_restricted_dates = st.datetimes(
+    min_value=datetime(1600, 1, 1), max_value=datetime(3000, 1, 1)
+)
+
+
+@given(_restricted_dates, _restricted_dates, _restricted_dates)
+def test_difference_against_dateutil(d1, d2, d3):
+    expected = dateutil.relativedelta.relativedelta(d1, d2)
+    actual = relativedelta.difference(d1, d2)
+
+    assert actual.months == 12 * expected.years + expected.months
+    assert d3 + actual == d3 + expected
