@@ -22,7 +22,7 @@ class RelativeDelta:
         timedelta: _pytimedelta | None = None,
         **delta_kwargs,
     ):
-        self.months = months + 12 * years
+        self.total_months = months + 12 * years
         self.timedelta = _pytimedelta(**delta_kwargs)
         if timedelta is not None:
             self.timedelta += timedelta
@@ -54,38 +54,38 @@ class RelativeDelta:
 
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, RelativeDelta):
-            return self.months == other.months and self.timedelta == other.timedelta
+            return (
+                self.total_months == other.total_months
+                and self.timedelta == other.timedelta
+            )
         elif isinstance(other, _pytimedelta):
-            return self.months == 0 and self.timedelta == other
+            return self.total_months == 0 and self.timedelta == other
         else:
             return False
 
     def __hash__(self):
-        return hash((self.months, self.timedelta))
+        return hash((self.total_months, self.timedelta))
 
     def __bool__(self) -> bool:
-        return bool(self.months or self.timedelta)
+        return bool(self.total_months or self.timedelta)
 
     def __neg__(self) -> RelativeDelta:
-        return self.__class__(months=-self.months, timedelta=-self.timedelta)
+        return self.__class__(months=-self.total_months, timedelta=-self.timedelta)
 
     def __add__(self, other: Any) -> RelativeDelta:
-        if isinstance(other, RelativeDelta):
-            months = self.months + other.months
-            delta = self.timedelta + other.timedelta
-        elif isinstance(other, _pytimedelta):
-            months = self.months
-            delta = self.timedelta + other
-        else:
-            return NotImplemented
-
-        return self.__class__(months=months, timedelta=delta)
+        return self.__radd__(other)
 
     def __radd__(self, other):
         if isinstance(other, (_date, _datetime)):
-            return _shift_months(other, self.months) + self.timedelta
-        elif isinstance(other, (_pytimedelta, RelativeDelta)):
-            return self + other
+            return _shift_months(other, self.total_months) + self.timedelta
+        elif isinstance(other, RelativeDelta):
+            months = self.total_months + other.total_months
+            delta = self.timedelta + other.timedelta
+            return self.__class__(months=months, timedelta=delta)
+        elif isinstance(other, _pytimedelta):
+            months = self.total_months
+            delta = self.timedelta + other
+            return self.__class__(months=months, timedelta=delta)
         else:
             return NotImplemented
 
@@ -96,16 +96,32 @@ class RelativeDelta:
         return other + (-self)
 
     def __mul__(self, n: int) -> RelativeDelta:
-        return self.__class__(months=self.months * n, timedelta=self.timedelta * n)
+        return self.__class__(
+            months=self.total_months * n, timedelta=self.timedelta * n
+        )
 
     def __rmul__(self, n: int) -> RelativeDelta:
         return self * n
 
     def __floordiv__(self, n: int) -> RelativeDelta:
-        return self.__class__(months=self.months // n, timedelta=self.timedelta // n)
+        return self.__class__(
+            months=self.total_months // n, timedelta=self.timedelta // n
+        )
 
     def __repr__(self) -> str:
-        return f"relativedelta(months={self.months}, timedelta={self.timedelta})"
+        return f"relativedelta(months={self.total_months}, timedelta={self.timedelta})"
+
+    def years(self) -> int:
+        """Years represented by this delta"""
+        return self.total_months // 12
+
+    def months(self) -> int:
+        """Months, excluding whole years, represented by this delta"""
+        return self.total_months % 12
+
+    def days(self) -> int:
+        """Days, excluding months and years, represented by this delta"""
+        return self.timedelta.days
 
 
 relativedelta = RelativeDelta  # XXX: alias for consistency with timedelta and dateutil

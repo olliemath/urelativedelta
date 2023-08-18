@@ -118,5 +118,5 @@ def test_difference_against_dateutil(d1, d2, d3):
     expected = dateutil.relativedelta.relativedelta(d1, d2)
     actual = relativedelta.difference(d1, d2)
 
-    assert actual.months == 12 * expected.years + expected.months
+    assert actual.total_months == 12 * expected.years + expected.months
     assert d3 + actual == d3 + expected
