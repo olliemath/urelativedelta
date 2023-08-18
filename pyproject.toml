@@ -1,8 +1,8 @@
 [project]
 name = "urelativedelta"
-version = "0.1.0"
+version = "0.2.0"
 authors = [
-  { name = "Oliver Margetts", email = "oliver.margetts@gmail.com" }
+    { name = "Oliver Margetts", email = "oliver.margetts@gmail.com" }
 ]
 description = "A small fast implementation of relativedelta"
 readme = "README.md"
@@ -11,6 +11,9 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
+]
+keywords = [
+    "relativedelta", "dateutil", "date", "datetime", "timedelta", "monthly", "daterule", "rrule"
 ]
 
 [project.urls]
