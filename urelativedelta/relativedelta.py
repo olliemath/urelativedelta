@@ -11,6 +11,8 @@ if _TYPE_CHECKING:
 
 
 class relativedelta:  # noqa: N801 - for consistency with timedelta and dateutil
+    """Represents relative difference between two dates."""
+
     def __init__(
         self,
         years: int = 0,
@@ -38,7 +40,7 @@ class relativedelta:  # noqa: N801 - for consistency with timedelta and dateutil
         return bool(self.months or self.timedelta)
 
     def __neg__(self) -> relativedelta:
-        return type(self)(months=-self.months, timedelta=-self.timedelta)
+        return self.__class__(months=-self.months, timedelta=-self.timedelta)
 
     def __add__(self, other: Any) -> relativedelta:
         if isinstance(other, relativedelta):

@@ -107,7 +107,9 @@ urelativedelta also exposes useful shift functions which are used internally, na
 ## Design decisions and gotchas
 
 We favour simplicity over complexity: we use only the Gregorian calendar and
-make no changes e.g. for dates before the 1500s.
+make no changes e.g. for dates before the 1500s. We also don't try to
+replicate some of the complex functionality of dateutil: we're mostly
+interested in shifting dates by years, months, days etc.
 
 For days between the 1st and 28th, shifting by months has an obvious
 unambiguous meaning which we always stick to. One month after Jan 28th is
