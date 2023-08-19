@@ -9,11 +9,14 @@ if _TYPE_CHECKING:
     D = TypeVar("D", date, datetime)
 
 
+_THIRTY_DAY_MONTHS = {4, 6, 9, 11}
+
+
 def is_leap_year(year: int) -> bool:
     return year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)
 
 
-def normalise_day(year: int, month: int, day: int) -> int:
+def _normalise_day(year: int, month: int, day: int) -> int:
     """Shift the day backwards until it lies in the month.
 
     XXX: No attempt is made to handle days outside the 1-31 range.
@@ -28,14 +31,30 @@ def normalise_day(year: int, month: int, day: int) -> int:
         return day
 
 
+def _shift_months_impl(
+    year: int, month: int, day: int, months: int
+) -> tuple[int, int, int]:
+    """Shift a date by the given number of months.
+
+    Ambiguous month-ends are shifted backwards as necessary."""
+    year = year + (month + months - 1) // 12
+    month = 1 + (month + months - 1) % 12
+
+    # Inlining normalise day gives a nontrivial speed boost
+    if day > 28:
+        if month == 2:
+            day = 28 + is_leap_year(year)
+        elif day == 31 and month in _THIRTY_DAY_MONTHS:
+            day = 30
+
+    return year, month, day
+
+
 def shift_months(date: D, months: int) -> D:
     """Shift a date by the given number of months.
 
     Ambiguous month-ends are shifted backwards as necessary."""
-    year = date.year + (date.month + months - 1) // 12
-    month = 1 + (date.month + months - 1) % 12
-    day = normalise_day(year, month, date.day)
-
+    year, month, day = _shift_months_impl(date.year, date.month, date.day, months)
     return date.replace(year=year, month=month, day=day)
 
 
@@ -51,7 +70,7 @@ def with_day(date: D, day: int) -> D:
 
     Ambiguous month-ends are shifted backwards as necessary.
     """
-    return date.replace(day=normalise_day(date.year, date.month, day))
+    return date.replace(day=_normalise_day(date.year, date.month, day))
 
 
 def with_month(date: D, month: int) -> D:

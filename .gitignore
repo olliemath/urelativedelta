@@ -165,3 +165,8 @@ requirements.lock
 
 # Ignore scripts :)
 .scripts/
+
+# Ignore benchmark artifacts
+*.svg
+*.txt
+*.json

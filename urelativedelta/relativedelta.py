@@ -12,6 +12,9 @@ if _TYPE_CHECKING:
     D = TypeVar("D", _datetime, _date)
 
 
+_ZERO = _pytimedelta(0)
+
+
 class RelativeDelta:
     """Represents relative difference between two dates."""
 
@@ -23,9 +26,14 @@ class RelativeDelta:
         **delta_kwargs,
     ):
         self.total_months = months + 12 * years
-        self.timedelta = _pytimedelta(**delta_kwargs)
-        if timedelta is not None:
-            self.timedelta += timedelta
+        if delta_kwargs:
+            self.timedelta = _pytimedelta(**delta_kwargs)
+            if timedelta is not None:
+                self.timedelta += timedelta
+        elif timedelta is not None:
+            self.timedelta = timedelta
+        else:
+            self.timedelta = _ZERO
 
     @classmethod
     def difference(cls, d1: D, d2: D) -> RelativeDelta:
@@ -77,7 +85,11 @@ class RelativeDelta:
 
     def __radd__(self, other):
         if isinstance(other, (_date, _datetime)):
-            return _shift_months(other, self.total_months) + self.timedelta
+            if self.total_months:
+                other = _shift_months(other, self.total_months)
+            if self.timedelta:
+                other += self.timedelta
+            return other
         elif isinstance(other, RelativeDelta):
             months = self.total_months + other.total_months
             delta = self.timedelta + other.timedelta
