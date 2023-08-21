@@ -36,13 +36,16 @@ class RelativeDelta:
             self.timedelta = _ZERO
 
     @classmethod
-    def difference(cls, d1: D, d2: D) -> RelativeDelta:
+    def difference(cls, d1: D | None, d2: D | None) -> RelativeDelta:
         """Create a relativedelta from the difference between two dates.
 
         This is guaranteed to satisfy
         >>> d2 + RealtiveDelta.between(d1, d2) == d1
         that is, it is the relativedelta equivalent of `d1 - d2`.
         """
+        if d1 is None or d2 is None:
+            return cls()
+
         # TODO: optimise this
         months = 12 * (d1.year - d2.year) + (d1.month - d2.month)
 

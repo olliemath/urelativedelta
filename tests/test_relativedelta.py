@@ -120,3 +120,10 @@ def test_difference_against_dateutil(d1, d2, d3):
 
     assert actual.total_months == 12 * expected.years + expected.months
     assert d3 + actual == d3 + expected
+
+
+def test_difference_with_nones():
+    # This is only here for compatability with dateutil
+    assert relativedelta.difference(date(2020, 1, 1), None) == relativedelta()
+    assert relativedelta.difference(None, date(2020, 1, 1)) == relativedelta()
+    assert relativedelta.difference(None, None) == relativedelta()
